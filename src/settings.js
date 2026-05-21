@@ -11,6 +11,7 @@ const store = new Store({
     autoExpand:  true,
     opacity:     100,
     position:    null,   // { x, y } — null means default bottom-right
+    captureRegion:  null,   // { x, y, width, height } in screen pixels, null = not set
   },
 });
 
