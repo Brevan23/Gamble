@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+  <title>Card Counter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ── Collapsed view ── -->
+    <div id="collapsed-view">
+      <div id="collapsed-count">0</div>
+      <div id="collapsed-bar" class="bar neutral"></div>
+    </div>
+
+    <!-- ── Expanded view ── -->
+    <div id="expanded-view" class="hidden">
+
+      <div class="header">
+        <span class="label-sm">Card Counter</span>
+        <button id="settings-btn" class="icon-btn" title="Settings">⚙</button>
+      </div>
+
+      <div class="counts-row">
+        <div class="count-block">
+          <div class="label-sm">Running</div>
+          <div id="running-count" class="count-lg">0</div>
+        </div>
+        <div class="count-block align-right">
+          <div class="label-sm">True</div>
+          <div id="true-count" class="count-md">0.0</div>
+        </div>
+      </div>
+
+      <div id="bet-advice-block" class="advice-block neutral">
+        <span class="advice-icon">💰</span>
+        <div>
+          <div class="label-xs">Bet</div>
+          <div id="bet-advice-text" class="advice-text">Table minimum</div>
+        </div>
+      </div>
+
+      <div id="hand-advice-block" class="advice-block hand">
+        <span class="advice-icon">🃏</span>
+        <div>
+          <div class="label-xs">Deviation</div>
+          <div id="hand-advice-text" class="advice-text">None at this count</div>
+        </div>
+      </div>
+
+      <div class="deck-section">
+        <div class="deck-row">
+          <span class="label-xs">Decks remaining</span>
+          <span id="decks-label" class="label-xs muted">5.5 / 6</span>
+        </div>
+        <div class="progress-track">
+          <div id="progress-fill" class="progress-fill" style="width:92%"></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span class="hint-text">2–6 +1 · 7–9 0 · 10-A −1</span>
+        <button id="reset-btn" class="reset-btn" title="Reset shoe (R)">↺ Reset</button>
+      </div>
+
+    </div><!-- /expanded-view -->
+
+    <!-- ── Settings panel (overlays expanded view) ── -->
+    <div id="settings-panel" class="hidden">
+      <div class="header">
+        <span class="label-sm">Settings</span>
+        <button id="settings-close" class="icon-btn">✕</button>
+      </div>
+
+      <div class="setting-row">
+        <span class="label-sm">Decks</span>
+        <div id="deck-buttons" class="deck-buttons">
+          <button class="deck-btn" data-decks="1">1</button>
+          <button class="deck-btn" data-decks="2">2</button>
+          <button class="deck-btn" data-decks="4">4</button>
+          <button class="deck-btn active" data-decks="6">6</button>
+          <button class="deck-btn" data-decks="8">8</button>
+        </div>
+      </div>
+
+      <div class="setting-row">
+        <span class="label-sm">Hand hints</span>
+        <label class="toggle">
+          <input type="checkbox" id="hand-advice-toggle" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <span class="label-sm">Opacity</span>
+        <input type="range" id="opacity-slider" min="40" max="100" value="100" class="slider">
+      </div>
+
+      <div class="setting-row shortcuts">
+        <span class="label-xs muted">Toggle: Ctrl+Shift+Space · Reset: R · Close: Esc</span>
+      </div>
+    </div>
+
+  </div><!-- /app -->
+  <script src="app.js"></script>
+</body>
+</html>
