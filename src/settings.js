@@ -1,7 +1,7 @@
 // src/settings.js
 'use strict';
 
-const Store = require('electron-store');
+const Store = require('electron-store').default;
 
 const store = new Store({
   name: 'card-counter-settings',
