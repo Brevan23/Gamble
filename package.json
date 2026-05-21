@@ -10,11 +10,13 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/test/**/*.test.js"]
+    "testMatch": [
+      "**/test/**/*.test.js"
+    ]
   },
   "dependencies": {
     "electron": "^32.0.0",
-    "electron-store": "^10.0.0"
+    "electron-store": "^8.2.0"
   },
   "devDependencies": {
     "electron-builder": "^25.0.0",
