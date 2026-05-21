@@ -14,8 +14,6 @@ const { openRegionSelector } = require('./capture/region-selector');
 const { startWatcher, stopWatcher } = require('./capture/watcher');
 const { destroyWorker }      = require('./capture/detector');
 
-let watcherRunning = false;
-
 // ── State ─────────────────────────────────────────────────────────────────
 const counter   = new Counter(settings.get('totalDecks'));
 let win         = null;
@@ -153,7 +151,6 @@ ipcMain.handle('capture:openSelector', async () => {
     settings.set('captureRegion', region);
     stopWatcher();
     startWatcher(region, counter, broadcastState);
-    watcherRunning = true;
     if (win && !win.isDestroyed()) {
       win.webContents.send('capture:status', { active: true, region });
     }
@@ -166,7 +163,6 @@ ipcMain.handle('capture:start', () => {
   if (!region) return { active: false, region: null };
   stopWatcher();
   startWatcher(region, counter, broadcastState);
-  watcherRunning = true;
   if (win && !win.isDestroyed()) {
     win.webContents.send('capture:status', { active: true, region });
   }
@@ -175,7 +171,6 @@ ipcMain.handle('capture:start', () => {
 
 ipcMain.handle('capture:stop', () => {
   stopWatcher();
-  watcherRunning = false;
   if (win && !win.isDestroyed()) {
     win.webContents.send('capture:status', { active: false, region: settings.get('captureRegion') });
   }
