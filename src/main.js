@@ -9,6 +9,13 @@ const path    = require('path');
 const Counter  = require('./counter');
 const settings = require('./settings');
 
+// ── Capture ───────────────────────────────────────────────────────────────
+const { openRegionSelector } = require('./capture/region-selector');
+const { startWatcher, stopWatcher } = require('./capture/watcher');
+const { destroyWorker }      = require('./capture/detector');
+
+let watcherRunning = false;
+
 // ── State ─────────────────────────────────────────────────────────────────
 const counter   = new Counter(settings.get('totalDecks'));
 let win         = null;
@@ -139,6 +146,42 @@ ipcMain.handle('window:toggleExpand', () => {
   return isExpanded;
 });
 
+// ── Capture IPC ───────────────────────────────────────────────────────────
+ipcMain.handle('capture:openSelector', async () => {
+  const region = await openRegionSelector();
+  if (region) {
+    settings.set('captureRegion', region);
+    stopWatcher();
+    startWatcher(region, counter, broadcastState);
+    watcherRunning = true;
+    if (win && !win.isDestroyed()) {
+      win.webContents.send('capture:status', { active: true, region });
+    }
+  }
+  return region;
+});
+
+ipcMain.handle('capture:start', () => {
+  const region = settings.get('captureRegion');
+  if (!region) return { active: false, region: null };
+  stopWatcher();
+  startWatcher(region, counter, broadcastState);
+  watcherRunning = true;
+  if (win && !win.isDestroyed()) {
+    win.webContents.send('capture:status', { active: true, region });
+  }
+  return { active: true, region };
+});
+
+ipcMain.handle('capture:stop', () => {
+  stopWatcher();
+  watcherRunning = false;
+  if (win && !win.isDestroyed()) {
+    win.webContents.send('capture:status', { active: false, region: settings.get('captureRegion') });
+  }
+  return { active: false };
+});
+
 // ── App lifecycle ─────────────────────────────────────────────────────────
 app.whenReady().then(() => {
   createWindow();
@@ -146,5 +189,9 @@ app.whenReady().then(() => {
   registerShortcuts();
 });
 
-app.on('will-quit',         () => globalShortcut.unregisterAll());
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+  stopWatcher();
+  destroyWorker().catch(() => {}); // async cleanup, ignore errors on exit
+});
 app.on('window-all-closed', (e) => e.preventDefault()); // keep alive in tray
