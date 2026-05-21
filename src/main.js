@@ -31,6 +31,7 @@ function broadcastState() {
 }
 
 function setExpanded(expanded) {
+  if (!win || win.isDestroyed()) return;
   isExpanded = expanded;
   const size = expanded ? EXPANDED : COLLAPSED;
 
@@ -93,7 +94,11 @@ function createTray() {
     },
     {
       label: 'Reset Shoe',
-      click: () => { counter.reset(); broadcastState(); win.webContents.send('counter:reset'); },
+      click: () => {
+        counter.reset();
+        broadcastState();
+        if (win && !win.isDestroyed()) win.webContents.send('counter:reset');
+      },
     },
     { type: 'separator' },
     { label: 'Quit', click: () => app.quit() },
@@ -117,7 +122,12 @@ function registerShortcuts() {
 
 // ── IPC handlers ──────────────────────────────────────────────────────────
 ipcMain.handle('counter:logCard',  (_, key) => { counter.logCard(key); broadcastState(); return counter.getState(); });
-ipcMain.handle('counter:reset',    ()       => { counter.reset();      broadcastState(); win.webContents.send('counter:reset'); return counter.getState(); });
+ipcMain.handle('counter:reset', () => {
+  counter.reset();
+  broadcastState();
+  if (win && !win.isDestroyed()) win.webContents.send('counter:reset');
+  return counter.getState();
+});
 ipcMain.handle('counter:getState', ()       => counter.getState());
 ipcMain.handle('counter:setDecks', (_, n)   => { counter.setDecks(n);  broadcastState(); return counter.getState(); });
 
