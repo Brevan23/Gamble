@@ -21,4 +21,10 @@ contextBridge.exposeInMainWorld('api', {
   onStateUpdate:  (cb)  => ipcRenderer.on('counter:stateUpdate',  (_, s)  => cb(s)),
   onExpandChange: (cb)  => ipcRenderer.on('window:expandChange',  (_, ex) => cb(ex)),
   onReset:        (cb)  => ipcRenderer.on('counter:reset',        ()      => cb()),
+
+  // Capture
+  openCaptureSelector: () => ipcRenderer.invoke('capture:openSelector'),
+  startCapture:        () => ipcRenderer.invoke('capture:start'),
+  stopCapture:         () => ipcRenderer.invoke('capture:stop'),
+  onCaptureStatus:     (cb) => ipcRenderer.on('capture:status', (_, s) => cb(s)),
 });
