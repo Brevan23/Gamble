@@ -233,3 +233,62 @@ button, input, .deck-buttons { -webkit-app-region: no-drag; }
   100% { border-color: #2a2a3e; }
 }
 .flash-reset { animation: flash-reset 0.5s ease; }
+
+/* ── Capture row ── */
+.capture-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.capture-btn {
+  background: #2a2a3e;
+  border: 1px solid #3a3a4e;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  -webkit-app-region: no-drag;
+}
+.capture-btn:hover { color: #e2e8f0; border-color: #555; }
+
+.capture-stop {
+  background: #2a2a3e;
+  border: 1px solid #ef444455;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 11px;
+  color: #ef4444;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  -webkit-app-region: no-drag;
+}
+.capture-stop:hover { border-color: #ef4444; }
+
+.capture-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #22c55e;
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rec-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+  animation: pulse-rec 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-rec {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}

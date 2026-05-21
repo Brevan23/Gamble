@@ -24,6 +24,9 @@ const resetBtn          = document.getElementById('reset-btn');
 const deckButtons       = document.querySelectorAll('.deck-btn');
 const handAdviceToggle  = document.getElementById('hand-advice-toggle');
 const opacitySlider     = document.getElementById('opacity-slider');
+const captureBtn    = document.getElementById('capture-btn');
+const captureStatus = document.getElementById('capture-status');
+const captureStop   = document.getElementById('capture-stop');
 
 // ── State ─────────────────────────────────────────────────────────────────
 let expanded        = false;
@@ -75,6 +78,18 @@ function flashReset() {
   setTimeout(() => collapsedView.classList.remove('flash-reset'), 500);
 }
 
+function setCaptureActive(active) {
+  if (active) {
+    captureBtn.classList.add('hidden');
+    captureStatus.classList.remove('hidden');
+    captureStop.classList.remove('hidden');
+  } else {
+    captureBtn.classList.remove('hidden');
+    captureStatus.classList.add('hidden');
+    captureStop.classList.add('hidden');
+  }
+}
+
 // ── Keyboard ──────────────────────────────────────────────────────────────
 const CARD_KEYS = new Set(['2','3','4','5','6','7','8','9','t','j','q','k','a']);
 
@@ -103,6 +118,7 @@ document.addEventListener('keydown', async (e) => {
 window.api.onStateUpdate((s)  => renderState(s));
 window.api.onExpandChange((ex) => setExpanded(ex));
 window.api.onReset(()         => flashReset());
+window.api.onCaptureStatus((s) => setCaptureActive(s.active));
 
 // ── Buttons ───────────────────────────────────────────────────────────────
 collapsedView.addEventListener('click', () => window.api.toggleExpand());
@@ -145,6 +161,19 @@ opacitySlider.addEventListener('input', async () => {
   const val = parseInt(opacitySlider.value, 10);
   document.documentElement.style.opacity = val / 100;
   await window.api.setSetting('opacity', val);
+});
+
+captureBtn.addEventListener('click', async () => {
+  const settings = await window.api.getSettings();
+  if (settings.captureRegion) {
+    await window.api.startCapture();
+  } else {
+    await window.api.openCaptureSelector();
+  }
+});
+
+captureStop.addEventListener('click', async () => {
+  await window.api.stopCapture();
 });
 
 // ── Initialise ────────────────────────────────────────────────────────────
