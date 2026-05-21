@@ -7,7 +7,7 @@ const store = new Store({
   name: 'card-counter-settings',
   defaults: {
     totalDecks:  6,
-    handAdvice:  true,
+    showHandAdvice:  true,
     autoExpand:  true,
     opacity:     100,
     position:    null,   // { x, y } — null means default bottom-right
