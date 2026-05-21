@@ -1,0 +1,80 @@
+<h2>How do you want to log cards?</h2>
+<p class="subtitle">Every card dealt needs to update the count — what's the fastest way for you?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="keyboard" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#111;padding:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:160px;gap:8px;">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+        <div style="background:#2a2a3e;border:1px solid #444;border-radius:7px;padding:7px 10px;font-size:12px;color:#e2e8f0;font-weight:600;box-shadow:0 2px 0 #111;">2</div>
+        <div style="background:#2a2a3e;border:1px solid #444;border-radius:7px;padding:7px 10px;font-size:12px;color:#e2e8f0;font-weight:600;box-shadow:0 2px 0 #111;">3</div>
+        <div style="background:#2a2a3e;border:1px solid #444;border-radius:7px;padding:7px 10px;font-size:12px;color:#e2e8f0;font-weight:600;box-shadow:0 2px 0 #111;">4</div>
+        <div style="background:#2a2a3e;border:1px solid #444;border-radius:7px;padding:7px 10px;font-size:12px;color:#e2e8f0;font-weight:600;box-shadow:0 2px 0 #111;">5</div>
+        <div style="background:#2a2a3e;border:1px solid #444;border-radius:7px;padding:7px 10px;font-size:12px;color:#e2e8f0;font-weight:600;box-shadow:0 2px 0 #111;">6</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+        <div style="background:#2a2a3e;border:1px solid #444;border-radius:7px;padding:7px 10px;font-size:12px;color:#888;font-weight:600;box-shadow:0 2px 0 #111;">7</div>
+        <div style="background:#2a2a3e;border:1px solid #444;border-radius:7px;padding:7px 10px;font-size:12px;color:#888;font-weight:600;box-shadow:0 2px 0 #111;">8</div>
+        <div style="background:#2a2a3e;border:1px solid #444;border-radius:7px;padding:7px 10px;font-size:12px;color:#888;font-weight:600;box-shadow:0 2px 0 #111;">9</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+        <div style="background:#2a2a3e;border:1px solid #ef4444;border-radius:7px;padding:7px 10px;font-size:12px;color:#ef4444;font-weight:600;box-shadow:0 2px 0 #111;">T</div>
+        <div style="background:#2a2a3e;border:1px solid #ef4444;border-radius:7px;padding:7px 10px;font-size:12px;color:#ef4444;font-weight:600;box-shadow:0 2px 0 #111;">J</div>
+        <div style="background:#2a2a3e;border:1px solid #ef4444;border-radius:7px;padding:7px 10px;font-size:12px;color:#ef4444;font-weight:600;box-shadow:0 2px 0 #111;">Q</div>
+        <div style="background:#2a2a3e;border:1px solid #ef4444;border-radius:7px;padding:7px 10px;font-size:12px;color:#ef4444;font-weight:600;box-shadow:0 2px 0 #111;">K</div>
+        <div style="background:#2a2a3e;border:1px solid #ef4444;border-radius:7px;padding:7px 10px;font-size:12px;color:#ef4444;font-weight:600;box-shadow:0 2px 0 #111;">A</div>
+      </div>
+      <div style="font-size:10px;color:#555;margin-top:4px;">press number/letter keys · no clicks needed</div>
+    </div>
+    <div class="card-body">
+      <h3>A — Keyboard Shortcuts</h3>
+      <p>Press a key for each card dealt. 2–9 for number cards, T/J/Q/K/A for face cards. Fast, hands-free, no mouse needed.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="buttons" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#111;padding:16px;display:flex;align-items:center;justify-content:center;min-height:160px;">
+      <div style="background:#1e1e2e;border-radius:14px;padding:14px;width:180px;box-shadow:0 4px 24px rgba(0,0,0,0.5);border:1px solid #333;">
+        <div style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Tap a card value</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;">
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#22c55e;font-weight:700;">2</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#22c55e;font-weight:700;">3</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#22c55e;font-weight:700;">4</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#22c55e;font-weight:700;">5</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#22c55e;font-weight:700;">6</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#888;font-weight:700;">7</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#888;font-weight:700;">8</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#888;font-weight:700;">9</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#ef4444;font-weight:700;">10</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#ef4444;font-weight:700;">J</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#ef4444;font-weight:700;">Q</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 0;text-align:center;font-size:12px;color:#ef4444;font-weight:700;">K</div>
+          <div style="background:#2a2a3e;border-radius:6px;padding:6px 4px;text-align:center;font-size:12px;color:#ef4444;font-weight:700;grid-column:span 4;">A</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Click Buttons</h3>
+      <p>Tap card values in the widget with your mouse. More visual, good if you prefer clicking over memorizing hotkeys.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="both" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#111;padding:16px;display:flex;align-items:center;justify-content:center;min-height:160px;gap:14px;">
+      <div style="text-align:center;">
+        <div style="font-size:28px;margin-bottom:4px;">⌨️</div>
+        <div style="font-size:10px;color:#666;">keyboard</div>
+      </div>
+      <div style="font-size:18px;color:#444;">+</div>
+      <div style="text-align:center;">
+        <div style="font-size:28px;margin-bottom:4px;">🖱️</div>
+        <div style="font-size:10px;color:#666;">click</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Both</h3>
+      <p>Keyboard shortcuts AND clickable buttons. Use whichever is convenient. Best of both worlds.</p>
+    </div>
+  </div>
+
+</div>

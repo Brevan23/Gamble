@@ -1,0 +1,10 @@
+appId: com.cardcounter.app
+productName: Card Counter
+directories:
+  output: dist
+win:
+  target: nsis
+  icon: src/assets/tray.png
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
