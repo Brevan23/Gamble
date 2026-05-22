@@ -292,3 +292,35 @@ button, input, .deck-buttons { -webkit-app-region: no-drag; }
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.25; }
 }
+
+/* ── Hand mode row ── */
+.hand-mode-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background: #2a2a3e;
+  border-radius: 8px;
+  border: 1px solid #3a3a4e;
+}
+
+.hand-mode-label {
+  font-size: 11px;
+  color: #e2e8f0;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+.hand-mode-hint {
+  font-size: 9px;
+  color: #444;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Strategy block reuses .advice-block — border/bg set dynamically via JS */
+.advice-block.strategy {
+  margin-bottom: 6px;
+}

@@ -27,11 +27,22 @@ const opacitySlider     = document.getElementById('opacity-slider');
 const captureBtn    = document.getElementById('capture-btn');
 const captureStatus = document.getElementById('capture-status');
 const captureStop   = document.getElementById('capture-stop');
+const handModeRow   = document.getElementById('hand-mode-row');
+const handModeLabel = document.getElementById('hand-mode-label');
+const strategyBlock = document.getElementById('strategy-block');
+const strategyText  = document.getElementById('strategy-text');
 
 // ── State ─────────────────────────────────────────────────────────────────
 let expanded        = false;
 let showHandAdvice  = true;
 let currentDecks    = 6;
+
+// Hand mode state
+let handMode       = false;
+let handPrefix     = 'hard';   // 'hard' | 'soft' | 'pair'
+let playerDigits   = [];       // digit strings building the total
+let playerPairCard = null;     // card value string for pair mode
+let hdDealerCard   = null;     // dealer upcard for strategy lookup
 
 // ── Render ────────────────────────────────────────────────────────────────
 function renderState(s) {
@@ -90,11 +101,137 @@ function setCaptureActive(active) {
   }
 }
 
+function enterHandMode() {
+  handMode       = true;
+  handPrefix     = 'hard';
+  playerDigits   = [];
+  playerPairCard = null;
+  hdDealerCard   = null;
+  handModeRow.classList.remove('hidden');
+  strategyBlock.classList.add('hidden');
+  renderHandMode();
+}
+
+function exitHandMode() {
+  handMode       = false;
+  handPrefix     = 'hard';
+  playerDigits   = [];
+  playerPairCard = null;
+  hdDealerCard   = null;
+  handModeRow.classList.add('hidden');
+  strategyBlock.classList.add('hidden');
+}
+
+function renderHandMode() {
+  // Build player display string
+  let playerDisplay = '';
+  if (handPrefix === 'soft')      playerDisplay = 'soft ';
+  else if (handPrefix === 'pair') playerDisplay = 'pair ';
+
+  if (handPrefix === 'pair' && playerPairCard) {
+    playerDisplay += playerPairCard.toUpperCase() + 's';
+  } else if (playerDigits.length > 0) {
+    playerDisplay += playerDigits.join('');
+  } else {
+    playerDisplay += '—';
+  }
+
+  const dealerDisplay = hdDealerCard ? hdDealerCard.toUpperCase() : '—';
+  handModeLabel.textContent = `H: ${playerDisplay} · D: ${dealerDisplay}`;
+
+  // Determine if we have enough info for a lookup
+  const playerTotal = handPrefix !== 'pair'
+    ? (playerDigits.length > 0 ? parseInt(playerDigits.join(''), 10) : null)
+    : null;
+  const hasPair  = handPrefix === 'pair' && playerPairCard !== null;
+  const hasTotal = hasPair || (playerTotal !== null && playerTotal >= 4);
+
+  if (!hasTotal || !hdDealerCard) {
+    strategyBlock.classList.add('hidden');
+    return;
+  }
+
+  const advice = window.api.getAdvice({
+    total:  playerTotal,
+    soft:   handPrefix === 'soft',
+    pair:   hasPair ? playerPairCard : false,
+    dealer: hdDealerCard,
+  });
+
+  if (advice) {
+    strategyBlock.style.background   = advice.color + '18';
+    strategyBlock.style.border       = `1px solid ${advice.color}44`;
+    strategyText.style.color         = advice.color;
+    strategyText.textContent         = advice.label;
+    strategyBlock.classList.remove('hidden');
+  } else {
+    strategyBlock.classList.add('hidden');
+  }
+}
+
+function handleHandModeKey(key) {
+  // Toggle / escape exits hand mode
+  if (key === 'h' || key === 'escape') { exitHandMode(); return; }
+
+  // Prefix keys — only before any input
+  if (key === 's' && playerDigits.length === 0 && !playerPairCard && handPrefix === 'hard') {
+    handPrefix = 'soft'; renderHandMode(); return;
+  }
+  if (key === 'p' && playerDigits.length === 0 && !playerPairCard && handPrefix === 'hard') {
+    handPrefix = 'pair'; renderHandMode(); return;
+  }
+
+  // Pair mode: next card key sets the pair card value
+  if (handPrefix === 'pair' && playerPairCard === null) {
+    if (CARD_KEYS.has(key)) {
+      playerPairCard = ['j','q','k'].includes(key) ? 't' : key;
+      renderHandMode(); return;
+    }
+    return;
+  }
+
+  // Digit entry (hard/soft) — only while dealer not yet set
+  if (handPrefix !== 'pair' && hdDealerCard === null && /^\d$/.test(key)) {
+    const tentative = parseInt([...playerDigits, key].join(''), 10);
+    if (tentative <= 21 && playerDigits.length < 2) {
+      playerDigits.push(key);
+      renderHandMode();
+    }
+    return;
+  }
+
+  // Dealer card — consumed when player input is ready
+  const playerReady = handPrefix === 'pair'
+    ? playerPairCard !== null
+    : playerDigits.length > 0;
+
+  if (playerReady && CARD_KEYS.has(key)) {
+    if (hdDealerCard !== null) {
+      // Second dealer card = reset for new hand
+      playerDigits   = [];
+      playerPairCard = null;
+      hdDealerCard   = null;
+      handPrefix     = 'hard';
+    }
+    hdDealerCard = key;
+    renderHandMode();
+  }
+}
+
 // ── Keyboard ──────────────────────────────────────────────────────────────
 const CARD_KEYS = new Set(['2','3','4','5','6','7','8','9','t','j','q','k','a']);
 
 document.addEventListener('keydown', async (e) => {
   const key = e.key.toLowerCase();
+
+  // Hand mode intercepts all keys first
+  if (handMode) {
+    handleHandModeKey(key);
+    return;
+  }
+
+  // Toggle hand mode
+  if (key === 'h') { enterHandMode(); return; }
 
   if (CARD_KEYS.has(key)) {
     const state = await window.api.logCard(key);
@@ -110,7 +247,7 @@ document.addEventListener('keydown', async (e) => {
   }
 
   if (key === 'escape') {
-    await window.api.toggleExpand(); // main will send window:expandChange
+    await window.api.toggleExpand();
   }
 });
 
