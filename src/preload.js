@@ -27,4 +27,10 @@ contextBridge.exposeInMainWorld('api', {
   startCapture:        () => ipcRenderer.invoke('capture:start'),
   stopCapture:         () => ipcRenderer.invoke('capture:stop'),
   onCaptureStatus:     (cb) => ipcRenderer.on('capture:status', (_, s) => cb(s)),
+
+  // Strategy
+  getAdvice: (hand) => {
+    const { getAdvice } = require('./strategy');
+    return getAdvice(hand);
+  },
 });
