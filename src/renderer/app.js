@@ -101,6 +101,9 @@ function setCaptureActive(active) {
   }
 }
 
+// ── Card keys ─────────────────────────────────────────────────────────────
+const CARD_KEYS = new Set(['2','3','4','5','6','7','8','9','t','j','q','k','a']);
+
 function enterHandMode() {
   handMode       = true;
   handPrefix     = 'hard';
@@ -213,14 +216,12 @@ function handleHandModeKey(key) {
       hdDealerCard   = null;
       handPrefix     = 'hard';
     }
-    hdDealerCard = key;
+    hdDealerCard = ['j','q','k'].includes(key) ? 't' : key;
     renderHandMode();
   }
 }
 
 // ── Keyboard ──────────────────────────────────────────────────────────────
-const CARD_KEYS = new Set(['2','3','4','5','6','7','8','9','t','j','q','k','a']);
-
 document.addEventListener('keydown', async (e) => {
   const key = e.key.toLowerCase();
 
