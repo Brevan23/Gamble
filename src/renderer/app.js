@@ -105,7 +105,7 @@ function renderState(s) {
   // Hand displays + strategy advice
   renderHandDisplay(s);
 
-  // Side bet advice (pre-hand only)
+  // Side bet advice (auto-hides once hand starts)
   renderSideBetAdvice(s);
 }
 
@@ -161,6 +161,9 @@ function renderHandDisplay(s) {
 }
 
 function renderSideBetAdvice(s) {
+  // Guard: elements must exist (defensive against future DOM refactors)
+  if (!sideBetBlock || !sideBetRowsEl) return;
+
   // Hide once the hand has started
   if (s.playerCards && s.playerCards.length > 0) {
     sideBetBlock.classList.add('hidden');
