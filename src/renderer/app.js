@@ -20,29 +20,58 @@ const progressFill      = document.getElementById('progress-fill');
 
 const settingsBtn       = document.getElementById('settings-btn');
 const settingsClose     = document.getElementById('settings-close');
-const resetBtn          = document.getElementById('reset-btn');
 const deckButtons       = document.querySelectorAll('.deck-btn');
 const handAdviceToggle  = document.getElementById('hand-advice-toggle');
 const opacitySlider     = document.getElementById('opacity-slider');
-const captureBtn    = document.getElementById('capture-btn');
-const captureStatus = document.getElementById('capture-status');
-const captureStop   = document.getElementById('capture-stop');
-const handModeRow   = document.getElementById('hand-mode-row');
-const handModeLabel = document.getElementById('hand-mode-label');
-const strategyBlock = document.getElementById('strategy-block');
-const strategyText  = document.getElementById('strategy-text');
+const captureBtn        = document.getElementById('capture-btn');
+const captureStatus     = document.getElementById('capture-status');
+const captureStop       = document.getElementById('capture-stop');
+
+const strategyBlock     = document.getElementById('strategy-block');
+const strategyText      = document.getElementById('strategy-text');
+const playerHandRow     = document.getElementById('player-hand-row');
+const dealerHandRow     = document.getElementById('dealer-hand-row');
+const cardPadEl         = document.getElementById('card-pad');
+const deleteBtn         = document.getElementById('delete-btn');
+const newHandBtn        = document.getElementById('new-hand-btn');
+const reshuffleBtn      = document.getElementById('reshuffle-btn');
 
 // ── State ─────────────────────────────────────────────────────────────────
-let expanded        = false;
-let showHandAdvice  = true;
-let currentDecks    = 6;
+let expanded       = false;
+let showHandAdvice = true;
+let currentDecks   = 6;
 
-// Hand mode state
-let handMode       = false;
-let handPrefix     = 'hard';   // 'hard' | 'soft' | 'pair'
-let playerDigits   = [];       // digit strings building the total
-let playerPairCard = null;     // card value string for pair mode
-let hdDealerCard   = null;     // dealer upcard for strategy lookup
+// Keys currently held — used to determine card routing
+const heldKeys = new Set();
+
+// ── Card key set (keyboard) ───────────────────────────────────────────────
+const CARD_KEYS = new Set(['2','3','4','5','6','7','8','9','t','j','q','k','a']);
+
+// ── Hand computation ──────────────────────────────────────────────────────
+// Returns { total, soft, pair } or null if cards array is empty.
+function computeHandInfo(cards) {
+  if (cards.length === 0) return null;
+  // All face cards already normalised to 't' by Counter, but guard anyway
+  const norm = cards.map(c => (c === 'j' || c === 'q' || c === 'k') ? 't' : c);
+
+  // Pair: exactly two identical cards
+  const pair = norm.length === 2 && norm[0] === norm[1] ? norm[0] : false;
+
+  // Total: aces count as 11, reduced to 1 if bust
+  let total = 0;
+  let aces  = 0;
+  for (const c of norm) {
+    if      (c === 'a') { total += 11; aces++; }
+    else if (c === 't') { total += 10; }
+    else                { total += parseInt(c, 10); }
+  }
+  while (total > 21 && aces > 0) { total -= 10; aces--; }
+
+  // Soft: an ace is still counting as 11
+  const soft = aces > 0;
+
+  return { total, soft, pair };
+}
 
 // ── Render ────────────────────────────────────────────────────────────────
 function renderState(s) {
@@ -58,7 +87,7 @@ function renderState(s) {
   betAdviceBlock.className = `advice-block ${s.betAdvice.level}`;
   betAdviceText.textContent = s.betAdvice.label;
 
-  // Hand advice
+  // Count-based deviation hints
   if (showHandAdvice && s.handAdvice) {
     handAdviceBlock.classList.remove('hidden');
     handAdviceText.textContent = s.handAdvice;
@@ -70,6 +99,59 @@ function renderState(s) {
   const pct = Math.max(0, Math.min(100, (s.decksRemaining / s.totalDecks) * 100));
   progressFill.style.width = `${pct}%`;
   decksLabel.textContent   = `${s.decksRemaining} / ${s.totalDecks}`;
+
+  // Hand displays + strategy advice
+  renderHandDisplay(s);
+}
+
+function renderHandDisplay(s) {
+  const { playerCards, dealerCard } = s;
+
+  // ── Player hand ──
+  if (!playerCards || playerCards.length === 0) {
+    playerHandRow.innerHTML = '<span class="empty-hand">—</span>';
+    playerHandRow.classList.remove('player-active');
+  } else {
+    const info = computeHandInfo(playerCards);
+    const cardEls = playerCards
+      .map(c => `<span class="mini-card player">${c.toUpperCase()}</span>`)
+      .join('');
+    const totalEl = info ? `<span class="hand-total">${info.total}</span>` : '';
+    playerHandRow.innerHTML = cardEls + totalEl;
+    playerHandRow.classList.add('player-active');
+  }
+
+  // ── Dealer card ──
+  if (!dealerCard) {
+    dealerHandRow.innerHTML = '<span class="empty-hand">—</span>';
+    dealerHandRow.classList.remove('dealer-active');
+  } else {
+    dealerHandRow.innerHTML = `<span class="mini-card dealer">${dealerCard.toUpperCase()}</span>`;
+    dealerHandRow.classList.add('dealer-active');
+  }
+
+  // ── Strategy advice (only when both hand and dealer are set) ──
+  const info = playerCards && playerCards.length > 0 ? computeHandInfo(playerCards) : null;
+
+  if (info && dealerCard && info.total >= 4 && info.total <= 21) {
+    const advice = window.api.getAdvice({
+      total:  info.total,
+      soft:   info.soft,
+      pair:   info.pair,
+      dealer: dealerCard,
+    });
+    if (advice) {
+      strategyBlock.style.background = advice.color + '18';
+      strategyBlock.style.border     = `1px solid ${advice.color}44`;
+      strategyText.style.color       = advice.color;
+      strategyText.textContent       = advice.label;
+      strategyBlock.classList.remove('hidden');
+    } else {
+      strategyBlock.classList.add('hidden');
+    }
+  } else {
+    strategyBlock.classList.add('hidden');
+  }
 }
 
 function setExpanded(ex) {
@@ -101,145 +183,58 @@ function setCaptureActive(active) {
   }
 }
 
-// ── Card keys ─────────────────────────────────────────────────────────────
-const CARD_KEYS = new Set(['2','3','4','5','6','7','8','9','t','j','q','k','a']);
-
-function enterHandMode() {
-  handMode       = true;
-  handPrefix     = 'hard';
-  playerDigits   = [];
-  playerPairCard = null;
-  hdDealerCard   = null;
-  handModeRow.classList.remove('hidden');
-  strategyBlock.classList.add('hidden');
-  renderHandMode();
-}
-
-function exitHandMode() {
-  handMode       = false;
-  handPrefix     = 'hard';
-  playerDigits   = [];
-  playerPairCard = null;
-  hdDealerCard   = null;
-  handModeRow.classList.add('hidden');
-  strategyBlock.classList.add('hidden');
-}
-
-function renderHandMode() {
-  // Build player display string
-  let playerDisplay = '';
-  if (handPrefix === 'soft')      playerDisplay = 'soft ';
-  else if (handPrefix === 'pair') playerDisplay = 'pair ';
-
-  if (handPrefix === 'pair' && playerPairCard) {
-    playerDisplay += playerPairCard.toUpperCase() + 's';
-  } else if (playerDigits.length > 0) {
-    playerDisplay += playerDigits.join('');
-  } else {
-    playerDisplay += '—';
-  }
-
-  const dealerDisplay = hdDealerCard ? hdDealerCard.toUpperCase() : '—';
-  handModeLabel.textContent = `H: ${playerDisplay} · D: ${dealerDisplay}`;
-
-  // Determine if we have enough info for a lookup
-  const playerTotal = handPrefix !== 'pair'
-    ? (playerDigits.length > 0 ? parseInt(playerDigits.join(''), 10) : null)
-    : null;
-  const hasPair  = handPrefix === 'pair' && playerPairCard !== null;
-  const hasTotal = hasPair || (playerTotal !== null && playerTotal >= 4);
-
-  if (!hasTotal || !hdDealerCard) {
-    strategyBlock.classList.add('hidden');
-    return;
-  }
-
-  const advice = window.api.getAdvice({
-    total:  playerTotal,
-    soft:   handPrefix === 'soft',
-    pair:   hasPair ? playerPairCard : false,
-    dealer: hdDealerCard,
-  });
-
-  if (advice) {
-    strategyBlock.style.background   = advice.color + '18';
-    strategyBlock.style.border       = `1px solid ${advice.color}44`;
-    strategyText.style.color         = advice.color;
-    strategyText.textContent         = advice.label;
-    strategyBlock.classList.remove('hidden');
-  } else {
-    strategyBlock.classList.add('hidden');
+// ── Modifier key tracking ─────────────────────────────────────────────────
+function updatePadModifier() {
+  cardPadEl.classList.remove('modifier-player', 'modifier-dealer');
+  if (heldKeys.has('h')) {
+    cardPadEl.classList.add('modifier-player');
+  } else if (heldKeys.has('d')) {
+    cardPadEl.classList.add('modifier-dealer');
   }
 }
 
-function handleHandModeKey(key) {
-  // Toggle / escape exits hand mode
-  if (key === 'h' || key === 'escape') { exitHandMode(); return; }
-
-  // Prefix keys — only before any input
-  if (key === 's' && playerDigits.length === 0 && !playerPairCard && handPrefix === 'hard') {
-    handPrefix = 'soft'; renderHandMode(); return;
-  }
-  if (key === 'p' && playerDigits.length === 0 && !playerPairCard && handPrefix === 'hard') {
-    handPrefix = 'pair'; renderHandMode(); return;
-  }
-
-  // Pair mode: next card key sets the pair card value
-  if (handPrefix === 'pair' && playerPairCard === null) {
-    if (CARD_KEYS.has(key)) {
-      playerPairCard = ['j','q','k'].includes(key) ? 't' : key;
-      renderHandMode(); return;
-    }
-    return;
-  }
-
-  // Digit entry (hard/soft) — only while dealer not yet set
-  if (handPrefix !== 'pair' && hdDealerCard === null && /^\d$/.test(key)) {
-    const tentative = parseInt([...playerDigits, key].join(''), 10);
-    if (tentative <= 21 && playerDigits.length < 2) {
-      playerDigits.push(key);
-      renderHandMode();
-    }
-    return;
-  }
-
-  // Dealer card — consumed when player input is ready
-  const playerReady = handPrefix === 'pair'
-    ? playerPairCard !== null
-    : playerDigits.length > 0;
-
-  if (playerReady && CARD_KEYS.has(key)) {
-    if (hdDealerCard !== null) {
-      // Second dealer card = reset for new hand
-      playerDigits   = [];
-      playerPairCard = null;
-      hdDealerCard   = null;
-      handPrefix     = 'hard';
-    }
-    hdDealerCard = ['j','q','k'].includes(key) ? 't' : key;
-    renderHandMode();
-  }
-}
+// If the window loses focus while H/D is held, clear held state
+window.addEventListener('blur', () => {
+  heldKeys.clear();
+  updatePadModifier();
+});
 
 // ── Keyboard ──────────────────────────────────────────────────────────────
 document.addEventListener('keydown', async (e) => {
   const key = e.key.toLowerCase();
 
-  // Hand mode intercepts all keys first
-  if (handMode) {
-    handleHandModeKey(key);
+  // Track H and D as modifier keys — don't treat as card keys
+  if (key === 'h' || key === 'd') {
+    heldKeys.add(key);
+    updatePadModifier();
     return;
   }
 
-  // Toggle hand mode
-  if (key === 'h') { enterHandMode(); return; }
-
+  // Card keys — route based on held modifier
   if (CARD_KEYS.has(key)) {
-    const state = await window.api.logCard(key);
+    const target = heldKeys.has('h') ? 'player'
+                 : heldKeys.has('d') ? 'dealer'
+                 : undefined;
+    const state = await window.api.logCard(key, target);
     renderState(state);
     return;
   }
 
+  // N = new hand (clear hand/dealer, keep count)
+  if (key === 'n') {
+    const state = await window.api.newHand();
+    renderState(state);
+    return;
+  }
+
+  // Backspace = delete last player card (or dealer card)
+  if (key === 'backspace') {
+    const state = await window.api.deleteCard();
+    renderState(state);
+    return;
+  }
+
+  // R = reshuffle (full hard reset)
   if (key === 'r') {
     const state = await window.api.reset();
     renderState(state);
@@ -252,10 +247,46 @@ document.addEventListener('keydown', async (e) => {
   }
 });
 
+document.addEventListener('keyup', (e) => {
+  const key = e.key.toLowerCase();
+  if (key === 'h' || key === 'd') {
+    heldKeys.delete(key);
+    updatePadModifier();
+  }
+});
+
+// ── Card pad clicks ───────────────────────────────────────────────────────
+cardPadEl.querySelectorAll('.card-pad-btn[data-card]').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const card   = btn.dataset.card;
+    const target = heldKeys.has('h') ? 'player'
+                 : heldKeys.has('d') ? 'dealer'
+                 : undefined;
+    const state  = await window.api.logCard(card, target);
+    renderState(state);
+  });
+});
+
+deleteBtn.addEventListener('click', async () => {
+  const state = await window.api.deleteCard();
+  renderState(state);
+});
+
+newHandBtn.addEventListener('click', async () => {
+  const state = await window.api.newHand();
+  renderState(state);
+});
+
+reshuffleBtn.addEventListener('click', async () => {
+  const state = await window.api.reset();
+  renderState(state);
+  flashReset();
+});
+
 // ── IPC subscriptions ─────────────────────────────────────────────────────
-window.api.onStateUpdate((s)  => renderState(s));
+window.api.onStateUpdate((s)   => renderState(s));
 window.api.onExpandChange((ex) => setExpanded(ex));
-window.api.onReset(()         => flashReset());
+window.api.onReset(()          => flashReset());
 window.api.onCaptureStatus((s) => setCaptureActive(s.active));
 
 // ── Buttons ───────────────────────────────────────────────────────────────
@@ -269,12 +300,6 @@ settingsBtn.addEventListener('click', () => {
 settingsClose.addEventListener('click', () => {
   settingsPanel.classList.add('hidden');
   expandedView.classList.remove('hidden');
-});
-
-resetBtn.addEventListener('click', async () => {
-  const state = await window.api.reset();
-  renderState(state);
-  flashReset();
 });
 
 deckButtons.forEach(btn => {
@@ -321,14 +346,12 @@ captureStop.addEventListener('click', async () => {
     window.api.getSettings(),
   ]);
 
-  // Apply saved settings
   showHandAdvice = settings.showHandAdvice !== false;
   handAdviceToggle.checked = showHandAdvice;
   opacitySlider.value = settings.opacity || 100;
   document.documentElement.style.opacity = (settings.opacity || 100) / 100;
   currentDecks = settings.totalDecks || 6;
 
-  // Highlight active deck button
   deckButtons.forEach(b => {
     b.classList.toggle('active', parseInt(b.dataset.decks, 10) === currentDecks);
   });
