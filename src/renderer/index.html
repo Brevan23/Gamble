@@ -33,12 +33,6 @@
         <button id="capture-stop" class="capture-stop hidden" title="Stop auto-detection">■ Stop</button>
       </div>
 
-      <!-- ── Hand mode input ── -->
-      <div id="hand-mode-row" class="hand-mode-row hidden">
-        <span id="hand-mode-label" class="hand-mode-label">H: — · D: —</span>
-        <span class="hand-mode-hint">Esc to clear</span>
-      </div>
-
       <!-- ── Strategy advice ── -->
       <div id="strategy-block" class="advice-block strategy hidden">
         <span class="advice-icon">🎯</span>
@@ -75,6 +69,62 @@
         </div>
       </div>
 
+      <!-- ── Card input section ── -->
+      <div class="card-input-section">
+
+        <!-- Your hand -->
+        <div class="hand-section">
+          <div class="section-label">
+            Your hand
+            <span class="modifier-hint">· hold <kbd class="key-h">H</kbd></span>
+          </div>
+          <div id="player-hand-row" class="hand-display-row">
+            <span class="empty-hand">—</span>
+          </div>
+        </div>
+
+        <!-- Dealer card -->
+        <div class="hand-section">
+          <div class="section-label">
+            Dealer
+            <span class="modifier-hint">· hold <kbd class="key-d">D</kbd></span>
+          </div>
+          <div id="dealer-hand-row" class="hand-display-row">
+            <span class="empty-hand">—</span>
+          </div>
+        </div>
+
+        <!-- Card pad -->
+        <div id="card-pad" class="card-pad">
+          <button class="card-pad-btn" data-card="2">2</button>
+          <button class="card-pad-btn" data-card="3">3</button>
+          <button class="card-pad-btn" data-card="4">4</button>
+          <button class="card-pad-btn" data-card="5">5</button>
+          <button class="card-pad-btn" data-card="6">6</button>
+          <button class="card-pad-btn" data-card="7">7</button>
+          <button class="card-pad-btn" data-card="8">8</button>
+          <button class="card-pad-btn" data-card="9">9</button>
+          <button class="card-pad-btn" data-card="t">T</button>
+          <button class="card-pad-btn" data-card="a">A</button>
+          <button id="delete-btn" class="card-pad-btn card-pad-delete">⌫</button>
+        </div>
+
+        <!-- Pad hint -->
+        <div class="pad-hint">
+          tap = any &nbsp;·&nbsp;
+          <kbd class="key-h">H</kbd> = yours &nbsp;·&nbsp;
+          <kbd class="key-d">D</kbd> = dealer
+        </div>
+
+      </div><!-- /card-input-section -->
+
+      <!-- ── Reset buttons ── -->
+      <div class="reset-row">
+        <button id="new-hand-btn" class="new-hand-btn">↺ New Hand</button>
+        <button id="reshuffle-btn" class="reshuffle-btn">🔀 Reshuffle</button>
+      </div>
+
+      <!-- ── Deck progress ── -->
       <div class="deck-section">
         <div class="deck-row">
           <span class="label-xs">Decks remaining</span>
@@ -83,11 +133,6 @@
         <div class="progress-track">
           <div id="progress-fill" class="progress-fill" style="width:92%"></div>
         </div>
-      </div>
-
-      <div class="footer">
-        <span class="hint-text">2–6 +1 · 7–9 0 · 10-A −1</span>
-        <button id="reset-btn" class="reset-btn" title="Reset shoe (R)">↺ Reset</button>
       </div>
 
     </div><!-- /expanded-view -->
@@ -124,7 +169,7 @@
       </div>
 
       <div class="setting-row shortcuts">
-        <span class="label-xs muted">Toggle: Ctrl+Shift+Space · Reset: R · Close: Esc</span>
+        <span class="label-xs muted">Toggle: Ctrl+Shift+Space · New hand: N · Reshuffle: R</span>
       </div>
     </div>
 
