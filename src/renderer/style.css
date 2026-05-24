@@ -479,3 +479,48 @@ button, input, .deck-buttons { -webkit-app-region: no-drag; }
 .advice-block.strategy {
   margin-bottom: 6px;
 }
+
+/* ── Side bet block ── */
+.side-bet-block {
+  background: #a855f718;
+  border: 1px solid #a855f744;
+  border-radius: 9px;
+  padding: 7px 10px;
+  margin-bottom: 6px;
+}
+
+.side-bet-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+.side-bet-icon {
+  font-size: 13px;
+}
+
+.side-bet-title {
+  color: #a855f7;
+}
+
+.side-bet-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #a855f7;
+  margin-bottom: 3px;
+}
+
+.side-bet-row:last-child {
+  margin-bottom: 0;
+}
+
+.side-bet-reason {
+  font-size: 9px;
+  font-weight: 400;
+  color: #9333ea;
+  margin-left: 2px;
+}
