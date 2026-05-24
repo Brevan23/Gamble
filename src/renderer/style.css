@@ -293,32 +293,187 @@ button, input, .deck-buttons { -webkit-app-region: no-drag; }
   50%       { opacity: 0.25; }
 }
 
-/* ── Hand mode row ── */
-.hand-mode-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* ── Card input section ── */
+.card-input-section {
   margin-bottom: 8px;
-  padding: 6px 10px;
-  background: #2a2a3e;
-  border-radius: 8px;
-  border: 1px solid #3a3a4e;
 }
 
-.hand-mode-label {
-  font-size: 11px;
-  color: #e2e8f0;
-  font-weight: 600;
-  font-family: 'Courier New', monospace;
-  letter-spacing: 0.5px;
+.hand-section {
+  margin-bottom: 6px;
 }
 
-.hand-mode-hint {
+.section-label {
   font-size: 9px;
-  color: #444;
+  color: #555;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
+
+.modifier-hint {
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.key-h, .key-d {
+  display: inline-block;
+  border-radius: 3px;
+  padding: 0 4px;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  font-style: normal;
+}
+
+.key-h {
+  background: #3b82f611;
+  border: 1px solid #3b82f655;
+  color: #93c5fd;
+}
+
+.key-d {
+  background: #f59e0b11;
+  border: 1px solid #f59e0b55;
+  color: #f59e0b;
+}
+
+.hand-display-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 5px 7px;
+  background: #2a2a3e;
+  border-radius: 7px;
+  border: 1px solid #3a3a4e;
+  min-height: 28px;
+  transition: border-color 0.2s;
+}
+
+.hand-display-row.player-active { border-color: #3b82f633; }
+.hand-display-row.dealer-active { border-color: #f59e0b33; }
+
+.mini-card {
+  background: #1e1e2e;
+  border: 1px solid #3a3a4e;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.mini-card.player { border-color: #3b82f666; color: #93c5fd; }
+.mini-card.dealer  { border-color: #f59e0b66; color: #f59e0b; }
+
+.hand-total {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.empty-hand {
+  font-size: 9px;
+  color: #333;
+}
+
+/* ── Card pad ── */
+.card-pad {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 4px;
+}
+
+.card-pad-btn {
+  background: #2a2a3e;
+  border: 1px solid #3a3a4e;
+  border-radius: 6px;
+  padding: 5px 0;
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  -webkit-app-region: no-drag;
+}
+
+.card-pad-btn:hover { color: #e2e8f0; border-color: #555; }
+
+.card-pad-delete {
+  flex: 0 0 26px;
+  color: #ef4444;
+  border-color: #ef444433;
+  background: #ef444411;
+}
+
+.card-pad-delete:hover { border-color: #ef4444; }
+
+/* Modifier active states — card pad highlights when H or D is held */
+.card-pad.modifier-player .card-pad-btn:not(.card-pad-delete) {
+  background: #3b82f622;
+  border-color: #3b82f655;
+  color: #93c5fd;
+}
+
+.card-pad.modifier-dealer .card-pad-btn:not(.card-pad-delete) {
+  background: #f59e0b22;
+  border-color: #f59e0b55;
+  color: #f59e0b;
+}
+
+/* Pad hint */
+.pad-hint {
+  font-size: 9px;
+  color: #333;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ── Reset row ── */
+.reset-row {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.new-hand-btn {
+  flex: 1;
+  background: #2a2a3e;
+  border: 1px solid #3b82f633;
+  border-radius: 6px;
+  padding: 4px 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  -webkit-app-region: no-drag;
+}
+
+.new-hand-btn:hover { border-color: #3b82f6; color: #93c5fd; }
+
+.reshuffle-btn {
+  flex: 1;
+  background: #2a2a3e;
+  border: 1px solid #3a3a4e;
+  border-radius: 6px;
+  padding: 4px 0;
+  font-size: 10px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  -webkit-app-region: no-drag;
+}
+
+.reshuffle-btn:hover { color: #e2e8f0; border-color: #555; }
 
 /* Strategy block reuses .advice-block — border/bg set dynamically via JS */
 .advice-block.strategy {
