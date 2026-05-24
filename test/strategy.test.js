@@ -264,13 +264,13 @@ describe('getAdvice — Illustrious 18 index plays (Hi-Lo 6-deck S17)', () => {
   });
 
   // #11 Hard 10 vs A
-  test('#11 hard 10 vs A, TC +4 → DOUBLE', () => {
+  test('#11 hard 10 vs A, TC +4 → TAKE INSURANCE (universal play)', () => {
     expect(getAdvice({ total: 10, soft: false, pair: false, dealer: 'a', trueCount: 4 }).label)
-      .toBe('DOUBLE');
+      .toBe('TAKE INSURANCE');
   });
-  test('#11 hard 10 vs A, TC +3 → HIT (basic strategy)', () => {
+  test('#11 hard 10 vs A, TC +3 → TAKE INSURANCE (universal play)', () => {
     expect(getAdvice({ total: 10, soft: false, pair: false, dealer: 'a', trueCount: 3 }).label)
-      .toBe('HIT');
+      .toBe('TAKE INSURANCE');
   });
 
   // #12 Hard 9 vs 7
@@ -288,9 +288,9 @@ describe('getAdvice — Illustrious 18 index plays (Hi-Lo 6-deck S17)', () => {
     expect(getAdvice({ total: 16, soft: false, pair: false, dealer: '9', trueCount: 5 }).label)
       .toBe('STAND');
   });
-  test('#13 hard 16 vs 9, TC +4 → HIT (basic strategy)', () => {
+  test('#13 hard 16 vs 9, TC +4 → SURRENDER (basic strategy)', () => {
     expect(getAdvice({ total: 16, soft: false, pair: false, dealer: '9', trueCount: 4 }).label)
-      .toBe('HIT');
+      .toBe('SURRENDER');
   });
 
   // #14 Hard 13 vs 2

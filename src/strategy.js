@@ -14,7 +14,7 @@ const HARD = {
   13: ['S',  'S',  'S',  'S',  'S',  'H',  'H',  'H',  'H',  'H'],
   14: ['S',  'S',  'S',  'S',  'S',  'H',  'H',  'H',  'H',  'H'],
   15: ['S',  'S',  'S',  'S',  'S',  'H',  'H',  'H',  'R',  'R'],
-  16: ['S',  'S',  'S',  'S',  'S',  'H',  'H',  'H',  'R',  'R'],
+  16: ['S',  'S',  'S',  'S',  'S',  'H',  'H',  'R',  'R',  'R'],
 };
 
 // Soft totals (A+2 through A+9, keyed by total 13–20)
@@ -57,9 +57,9 @@ const ACTION_INFO = {
 // Evaluated in order; first match wins. Only active when trueCount is a number.
 // ctx.dealer and ctx.pair are already normalised (j/q/k → t).
 const INDEX_PLAYS = [
-  // #1  Insurance: hard 16 vs A, TC ≥ +3 → Take insurance instead of surrendering
-  { check: ({ total, soft, pair, dealer, trueCount }) =>
-      !soft && !pair && total === 16 && dealer === 'a' && trueCount >= 3,
+  // #1  Insurance: dealer A, TC ≥ +3 → Take insurance (any hand)
+  { check: ({ dealer, trueCount }) =>
+      dealer === 'a' && trueCount >= 3,
     action: 'INS' },
   // #2  Hard 16 vs T: TC ≥ 0 → Stand (was Surrender)
   { check: ({ total, soft, pair, dealer, trueCount }) =>
