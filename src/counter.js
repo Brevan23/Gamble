@@ -4,18 +4,49 @@
 const LOW  = new Set(['2','3','4','5','6']);
 const HIGH = new Set(['t','j','q','k','a']);
 
+// Normalise face cards to 't' for hand tracking
+function normaliseCard(k) {
+  return (k === 'j' || k === 'q' || k === 'k') ? 't' : k;
+}
+
 class Counter {
   constructor(totalDecks = 6) {
     this.totalDecks   = totalDecks;
     this.runningCount = 0;
     this.cardsSeen    = 0;
+    this.playerCards  = [];   // individual card keys, e.g. ['9','7']
+    this.dealerCard   = null; // single upcard key, e.g. '6'
   }
 
-  logCard(key) {
+  // target: 'player' | 'dealer' | undefined (count only)
+  logCard(key, target) {
     const k = key.toLowerCase();
-    if (LOW.has(k))       this.runningCount += 1;
-    else if (HIGH.has(k)) this.runningCount -= 1;
+
+    // Only count cards that are not dealer cards
+    if (target !== 'dealer') {
+      if (LOW.has(k))       this.runningCount += 1;
+      else if (HIGH.has(k)) this.runningCount -= 1;
+    }
     this.cardsSeen += 1;
+
+    if (target === 'player') {
+      this.playerCards.push(normaliseCard(k));
+    } else if (target === 'dealer') {
+      this.dealerCard = normaliseCard(k);
+    }
+  }
+
+  newHand() {
+    this.playerCards = [];
+    this.dealerCard  = null;
+  }
+
+  deleteCard() {
+    if (this.playerCards.length > 0) {
+      this.playerCards.pop();
+    } else if (this.dealerCard !== null) {
+      this.dealerCard = null;
+    }
   }
 
   get decksRemaining() {
@@ -47,6 +78,8 @@ class Counter {
   reset() {
     this.runningCount = 0;
     this.cardsSeen    = 0;
+    this.playerCards  = [];
+    this.dealerCard   = null;
   }
 
   setDecks(n) {
@@ -63,6 +96,8 @@ class Counter {
       trueCount:      Math.round(this.trueCount      * 10) / 10,
       betAdvice:      this.betAdvice,
       handAdvice:     this.handAdvice,
+      playerCards:    [...this.playerCards],
+      dealerCard:     this.dealerCard,
     };
   }
 }

@@ -141,3 +141,120 @@ describe('Counter — reset / setDecks', () => {
     expect(typeof s.betAdvice).toBe('object');
   });
 });
+
+describe('Counter — hand state', () => {
+  test('starts with empty playerCards and null dealerCard', () => {
+    const c = new Counter();
+    expect(c.playerCards).toEqual([]);
+    expect(c.dealerCard).toBeNull();
+  });
+
+  test('logCard with target "player" adds card to playerCards', () => {
+    const c = new Counter();
+    c.logCard('9', 'player');
+    expect(c.playerCards).toEqual(['9']);
+    expect(c.cardsSeen).toBe(1);
+  });
+
+  test('logCard with target "dealer" sets dealerCard', () => {
+    const c = new Counter();
+    c.logCard('6', 'dealer');
+    expect(c.dealerCard).toBe('6');
+    expect(c.cardsSeen).toBe(1);
+  });
+
+  test('logCard with no target only counts, does not touch hand state', () => {
+    const c = new Counter();
+    c.logCard('2');
+    expect(c.playerCards).toEqual([]);
+    expect(c.dealerCard).toBeNull();
+    expect(c.runningCount).toBe(1);
+  });
+
+  test('logCard normalises j/q/k to "t" when adding to player hand', () => {
+    const c = new Counter();
+    c.logCard('k', 'player');
+    expect(c.playerCards).toEqual(['t']);
+  });
+
+  test('logCard normalises j/q/k to "t" when setting dealer card', () => {
+    const c = new Counter();
+    c.logCard('q', 'dealer');
+    expect(c.dealerCard).toBe('t');
+  });
+
+  test('logCard setting a second dealer card replaces the first', () => {
+    const c = new Counter();
+    c.logCard('6', 'dealer');
+    c.logCard('a', 'dealer');
+    expect(c.dealerCard).toBe('a');
+  });
+});
+
+describe('Counter — newHand', () => {
+  test('clears playerCards and dealerCard but keeps count', () => {
+    const c = new Counter();
+    c.logCard('2', 'player');
+    c.logCard('9', 'player');
+    c.logCard('6', 'dealer');
+    c.newHand();
+    expect(c.playerCards).toEqual([]);
+    expect(c.dealerCard).toBeNull();
+    expect(c.runningCount).toBe(1); // the 2 was still counted
+    expect(c.cardsSeen).toBe(3);
+  });
+});
+
+describe('Counter — deleteCard', () => {
+  test('removes last card from playerCards when hand is non-empty', () => {
+    const c = new Counter();
+    c.logCard('9', 'player');
+    c.logCard('7', 'player');
+    c.deleteCard();
+    expect(c.playerCards).toEqual(['9']);
+  });
+
+  test('clears dealerCard when playerCards is empty', () => {
+    const c = new Counter();
+    c.logCard('6', 'dealer');
+    c.deleteCard();
+    expect(c.dealerCard).toBeNull();
+  });
+
+  test('does nothing when both hand and dealer are empty', () => {
+    const c = new Counter();
+    expect(() => c.deleteCard()).not.toThrow();
+    expect(c.playerCards).toEqual([]);
+    expect(c.dealerCard).toBeNull();
+  });
+});
+
+describe('Counter — reset clears hand state', () => {
+  test('reset clears playerCards and dealerCard', () => {
+    const c = new Counter();
+    c.logCard('9', 'player');
+    c.logCard('6', 'dealer');
+    c.reset();
+    expect(c.playerCards).toEqual([]);
+    expect(c.dealerCard).toBeNull();
+  });
+});
+
+describe('Counter — getState includes hand state', () => {
+  test('getState returns playerCards and dealerCard', () => {
+    const c = new Counter();
+    c.logCard('9', 'player');
+    c.logCard('6', 'dealer');
+    const s = c.getState();
+    expect(s.playerCards).toEqual(['9']);
+    expect(s.dealerCard).toBe('6');
+  });
+
+  test('getState returns a copy of playerCards (not the internal array)', () => {
+    const c = new Counter();
+    c.logCard('9', 'player');
+    const s = c.getState();
+    s.playerCards.push('MUTATED');
+    expect(c.playerCards).toEqual(['9']);
+  });
+});
