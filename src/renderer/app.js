@@ -107,16 +107,18 @@ function renderState(s) {
 function renderHandDisplay(s) {
   const { playerCards, dealerCard } = s;
 
+  // Compute hand info once — reused for both the display total and strategy lookup
+  const info = (playerCards && playerCards.length > 0) ? computeHandInfo(playerCards) : null;
+
   // ── Player hand ──
-  if (!playerCards || playerCards.length === 0) {
+  if (!info) {
     playerHandRow.innerHTML = '<span class="empty-hand">—</span>';
     playerHandRow.classList.remove('player-active');
   } else {
-    const info = computeHandInfo(playerCards);
     const cardEls = playerCards
       .map(c => `<span class="mini-card player">${c.toUpperCase()}</span>`)
       .join('');
-    const totalEl = info ? `<span class="hand-total">${info.total}</span>` : '';
+    const totalEl = `<span class="hand-total">${info.total}</span>`;
     playerHandRow.innerHTML = cardEls + totalEl;
     playerHandRow.classList.add('player-active');
   }
@@ -131,8 +133,6 @@ function renderHandDisplay(s) {
   }
 
   // ── Strategy advice (only when both hand and dealer are set) ──
-  const info = playerCards && playerCards.length > 0 ? computeHandInfo(playerCards) : null;
-
   if (info && dealerCard && info.total >= 4 && info.total <= 21) {
     const advice = window.api.getAdvice({
       total:  info.total,
@@ -205,8 +205,10 @@ document.addEventListener('keydown', async (e) => {
 
   // Track H and D as modifier keys — don't treat as card keys
   if (key === 'h' || key === 'd') {
-    heldKeys.add(key);
-    updatePadModifier();
+    if (!e.repeat) {   // ignore key-repeat events; Set.add is idempotent but saves DOM work
+      heldKeys.add(key);
+      updatePadModifier();
+    }
     return;
   }
 
