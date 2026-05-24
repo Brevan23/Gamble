@@ -35,6 +35,8 @@ const cardPadEl         = document.getElementById('card-pad');
 const deleteBtn         = document.getElementById('delete-btn');
 const newHandBtn        = document.getElementById('new-hand-btn');
 const reshuffleBtn      = document.getElementById('reshuffle-btn');
+const sideBetBlock      = document.getElementById('side-bet-block');
+const sideBetRowsEl     = document.getElementById('side-bet-rows');
 
 // ── State ─────────────────────────────────────────────────────────────────
 let expanded       = false;
@@ -102,6 +104,9 @@ function renderState(s) {
 
   // Hand displays + strategy advice
   renderHandDisplay(s);
+
+  // Side bet advice (pre-hand only)
+  renderSideBetAdvice(s);
 }
 
 function renderHandDisplay(s) {
@@ -135,10 +140,11 @@ function renderHandDisplay(s) {
   // ── Strategy advice (only when both hand and dealer are set) ──
   if (info && dealerCard && info.total >= 4 && info.total <= 21) {
     const advice = window.api.getAdvice({
-      total:  info.total,
-      soft:   info.soft,
-      pair:   info.pair,
-      dealer: dealerCard,
+      total:     info.total,
+      soft:      info.soft,
+      pair:      info.pair,
+      dealer:    dealerCard,
+      trueCount: s.trueCount,
     });
     if (advice) {
       strategyBlock.style.background = advice.color + '18';
@@ -152,6 +158,25 @@ function renderHandDisplay(s) {
   } else {
     strategyBlock.classList.add('hidden');
   }
+}
+
+function renderSideBetAdvice(s) {
+  // Hide once the hand has started
+  if (s.playerCards && s.playerCards.length > 0) {
+    sideBetBlock.classList.add('hidden');
+    return;
+  }
+
+  const bets = window.api.getSideBetAdvice(s.trueCount, s.dealerCard);
+  if (!bets || bets.length === 0) {
+    sideBetBlock.classList.add('hidden');
+    return;
+  }
+
+  sideBetRowsEl.innerHTML = bets
+    .map(b => `<div class="side-bet-row">✅ <span>${b.name}</span><span class="side-bet-reason">${b.reason}</span></div>`)
+    .join('');
+  sideBetBlock.classList.remove('hidden');
 }
 
 function setExpanded(ex) {
