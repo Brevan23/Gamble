@@ -5,22 +5,24 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
   // Counter
-  logCard:        (key) => ipcRenderer.invoke('counter:logCard', key),
-  reset:          ()    => ipcRenderer.invoke('counter:reset'),
-  getState:       ()    => ipcRenderer.invoke('counter:getState'),
-  setDecks:       (n)   => ipcRenderer.invoke('counter:setDecks', n),
+  logCard:      (key, target) => ipcRenderer.invoke('counter:logCard', key, target),
+  reset:        ()            => ipcRenderer.invoke('counter:reset'),
+  getState:     ()            => ipcRenderer.invoke('counter:getState'),
+  setDecks:     (n)           => ipcRenderer.invoke('counter:setDecks', n),
+  newHand:      ()            => ipcRenderer.invoke('counter:newHand'),
+  deleteCard:   ()            => ipcRenderer.invoke('counter:deleteCard'),
 
   // Settings
-  getSettings:    ()           => ipcRenderer.invoke('settings:getAll'),
-  setSetting:     (key, value) => ipcRenderer.invoke('settings:set', key, value),
+  getSettings:  ()           => ipcRenderer.invoke('settings:getAll'),
+  setSetting:   (key, value) => ipcRenderer.invoke('settings:set', key, value),
 
   // Window
-  toggleExpand:   ()    => ipcRenderer.invoke('window:toggleExpand'),
+  toggleExpand: () => ipcRenderer.invoke('window:toggleExpand'),
 
   // Subscriptions (main → renderer pushes)
-  onStateUpdate:  (cb)  => ipcRenderer.on('counter:stateUpdate',  (_, s)  => cb(s)),
-  onExpandChange: (cb)  => ipcRenderer.on('window:expandChange',  (_, ex) => cb(ex)),
-  onReset:        (cb)  => ipcRenderer.on('counter:reset',        ()      => cb()),
+  onStateUpdate:  (cb) => ipcRenderer.on('counter:stateUpdate', (_, s)  => cb(s)),
+  onExpandChange: (cb) => ipcRenderer.on('window:expandChange', (_, ex) => cb(ex)),
+  onReset:        (cb) => ipcRenderer.on('counter:reset',       ()      => cb()),
 
   // Capture
   openCaptureSelector: () => ipcRenderer.invoke('capture:openSelector'),

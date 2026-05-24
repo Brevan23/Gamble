@@ -21,7 +21,7 @@ let tray        = null;
 let isExpanded  = false;
 
 const COLLAPSED = { width: 90,  height: 90  };
-const EXPANDED  = { width: 220, height: 300 };
+const EXPANDED  = { width: 220, height: 460 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 function getDefaultPosition(size) {
@@ -126,7 +126,11 @@ function registerShortcuts() {
 }
 
 // ── IPC handlers ──────────────────────────────────────────────────────────
-ipcMain.handle('counter:logCard',  (_, key) => { counter.logCard(key); broadcastState(); return counter.getState(); });
+ipcMain.handle('counter:logCard', (_, key, target) => {
+  counter.logCard(key, target);
+  broadcastState();
+  return counter.getState();
+});
 ipcMain.handle('counter:reset', () => {
   counter.reset();
   broadcastState();
@@ -135,6 +139,18 @@ ipcMain.handle('counter:reset', () => {
 });
 ipcMain.handle('counter:getState', ()       => counter.getState());
 ipcMain.handle('counter:setDecks', (_, n)   => { counter.setDecks(n);  broadcastState(); return counter.getState(); });
+
+ipcMain.handle('counter:newHand', () => {
+  counter.newHand();
+  broadcastState();
+  return counter.getState();
+});
+
+ipcMain.handle('counter:deleteCard', () => {
+  counter.deleteCard();
+  broadcastState();
+  return counter.getState();
+});
 
 ipcMain.handle('settings:getAll',  ()            => settings.getAll());
 ipcMain.handle('settings:set',     (_, key, val) => { settings.set(key, val); return true; });
