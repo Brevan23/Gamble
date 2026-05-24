@@ -54,6 +54,7 @@ const ACTION_INFO = {
 };
 
 // Illustrious 18 index plays — Hi-Lo, 6-deck S17 (Schlesinger, Blackjack Attack)
+// 17 plays implemented; the 18th varies by source/rule-set — see design spec.
 // Evaluated in order; first match wins. Only active when trueCount is a number.
 // ctx.dealer and ctx.pair are already normalised (j/q/k → t).
 const INDEX_PLAYS = [
@@ -105,7 +106,7 @@ const INDEX_PLAYS = [
   { check: ({ total, soft, pair, dealer, trueCount }) =>
       !soft && !pair && total === 9 && dealer === '7' && trueCount >= 3,
     action: 'D' },
-  // #13 Hard 16 vs 9: TC ≥ +5 → Stand (was Hit)
+  // #13 Hard 16 vs 9: TC ≥ +5 → Stand (was Surrender)
   { check: ({ total, soft, pair, dealer, trueCount }) =>
       !soft && !pair && total === 16 && dealer === '9' && trueCount >= 5,
     action: 'S' },
