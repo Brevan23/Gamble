@@ -35,4 +35,8 @@ contextBridge.exposeInMainWorld('api', {
     const { getAdvice } = require('./strategy');
     return getAdvice(hand);
   },
+  getSideBetAdvice: (trueCount, dealerCard) => {
+    const { getSideBetAdvice } = require('./sidebets');
+    return getSideBetAdvice({ trueCount, dealerCard });
+  },
 });
