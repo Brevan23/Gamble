@@ -149,3 +149,187 @@ describe('getAdvice — invalid / edge inputs', () => {
     expect(getAdvice({ total: 16, soft: false, pair: false, dealer: 'x' })).toBeNull();
   });
 });
+
+describe('getAdvice — Illustrious 18 index plays (Hi-Lo 6-deck S17)', () => {
+  // Backward compatibility: trueCount absent or null → pure basic strategy
+  test('no trueCount → hard 16 vs T still SURRENDER', () => {
+    expect(getAdvice({ total: 16, soft: false, pair: false, dealer: 't' }).label)
+      .toBe('SURRENDER');
+  });
+  test('trueCount null → hard 16 vs T still SURRENDER', () => {
+    expect(getAdvice({ total: 16, soft: false, pair: false, dealer: 't', trueCount: null }).label)
+      .toBe('SURRENDER');
+  });
+
+  // #1 Insurance
+  test('#1 dealer A, TC +3 → TAKE INSURANCE', () => {
+    const r = getAdvice({ total: 16, soft: false, pair: false, dealer: 'a', trueCount: 3 });
+    expect(r.action).toBe('INS');
+    expect(r.label).toBe('TAKE INSURANCE');
+    expect(r.color).toBe('#a855f7');
+  });
+  test('#1 TC +2 with dealer A → falls to basic strategy', () => {
+    const r = getAdvice({ total: 16, soft: false, pair: false, dealer: 'a', trueCount: 2 });
+    expect(r.action).not.toBe('INS');
+  });
+
+  // #2 Hard 16 vs T
+  test('#2 hard 16 vs T, TC 0 → STAND', () => {
+    expect(getAdvice({ total: 16, soft: false, pair: false, dealer: 't', trueCount: 0 }).label)
+      .toBe('STAND');
+  });
+  test('#2 hard 16 vs T, TC -1 → SURRENDER (basic strategy)', () => {
+    expect(getAdvice({ total: 16, soft: false, pair: false, dealer: 't', trueCount: -1 }).label)
+      .toBe('SURRENDER');
+  });
+
+  // #3 Hard 15 vs T
+  test('#3 hard 15 vs T, TC +4 → STAND', () => {
+    expect(getAdvice({ total: 15, soft: false, pair: false, dealer: 't', trueCount: 4 }).label)
+      .toBe('STAND');
+  });
+  test('#3 hard 15 vs T, TC +3 → SURRENDER (basic strategy)', () => {
+    expect(getAdvice({ total: 15, soft: false, pair: false, dealer: 't', trueCount: 3 }).label)
+      .toBe('SURRENDER');
+  });
+
+  // #4 T,T vs 5
+  test('#4 pair T vs 5, TC +5 → SPLIT', () => {
+    expect(getAdvice({ total: null, soft: false, pair: 't', dealer: '5', trueCount: 5 }).label)
+      .toBe('SPLIT');
+  });
+  test('#4 pair T vs 5, TC +4 → STAND (basic strategy)', () => {
+    expect(getAdvice({ total: null, soft: false, pair: 't', dealer: '5', trueCount: 4 }).label)
+      .toBe('STAND');
+  });
+
+  // #5 T,T vs 6
+  test('#5 pair T vs 6, TC +4 → SPLIT', () => {
+    expect(getAdvice({ total: null, soft: false, pair: 't', dealer: '6', trueCount: 4 }).label)
+      .toBe('SPLIT');
+  });
+  test('#5 pair T vs 6, TC +3 → STAND (basic strategy)', () => {
+    expect(getAdvice({ total: null, soft: false, pair: 't', dealer: '6', trueCount: 3 }).label)
+      .toBe('STAND');
+  });
+
+  // #6 Hard 10 vs T
+  test('#6 hard 10 vs T, TC +4 → DOUBLE', () => {
+    expect(getAdvice({ total: 10, soft: false, pair: false, dealer: 't', trueCount: 4 }).label)
+      .toBe('DOUBLE');
+  });
+  test('#6 hard 10 vs T, TC +3 → HIT (basic strategy)', () => {
+    expect(getAdvice({ total: 10, soft: false, pair: false, dealer: 't', trueCount: 3 }).label)
+      .toBe('HIT');
+  });
+
+  // #7 Hard 12 vs 3
+  test('#7 hard 12 vs 3, TC +2 → STAND', () => {
+    expect(getAdvice({ total: 12, soft: false, pair: false, dealer: '3', trueCount: 2 }).label)
+      .toBe('STAND');
+  });
+  test('#7 hard 12 vs 3, TC +1 → HIT (basic strategy)', () => {
+    expect(getAdvice({ total: 12, soft: false, pair: false, dealer: '3', trueCount: 1 }).label)
+      .toBe('HIT');
+  });
+
+  // #8 Hard 12 vs 2
+  test('#8 hard 12 vs 2, TC +3 → STAND', () => {
+    expect(getAdvice({ total: 12, soft: false, pair: false, dealer: '2', trueCount: 3 }).label)
+      .toBe('STAND');
+  });
+  test('#8 hard 12 vs 2, TC +2 → HIT (basic strategy)', () => {
+    expect(getAdvice({ total: 12, soft: false, pair: false, dealer: '2', trueCount: 2 }).label)
+      .toBe('HIT');
+  });
+
+  // #9 Hard 11 vs A
+  test('#9 hard 11 vs A, TC +1 → DOUBLE', () => {
+    expect(getAdvice({ total: 11, soft: false, pair: false, dealer: 'a', trueCount: 1 }).label)
+      .toBe('DOUBLE');
+  });
+  test('#9 hard 11 vs A, TC 0 → HIT (basic strategy)', () => {
+    expect(getAdvice({ total: 11, soft: false, pair: false, dealer: 'a', trueCount: 0 }).label)
+      .toBe('HIT');
+  });
+
+  // #10 Hard 9 vs 2
+  test('#10 hard 9 vs 2, TC +1 → DOUBLE', () => {
+    expect(getAdvice({ total: 9, soft: false, pair: false, dealer: '2', trueCount: 1 }).label)
+      .toBe('DOUBLE');
+  });
+  test('#10 hard 9 vs 2, TC 0 → HIT (basic strategy)', () => {
+    expect(getAdvice({ total: 9, soft: false, pair: false, dealer: '2', trueCount: 0 }).label)
+      .toBe('HIT');
+  });
+
+  // #11 Hard 10 vs A
+  test('#11 hard 10 vs A, TC +4 → DOUBLE', () => {
+    expect(getAdvice({ total: 10, soft: false, pair: false, dealer: 'a', trueCount: 4 }).label)
+      .toBe('DOUBLE');
+  });
+  test('#11 hard 10 vs A, TC +3 → HIT (basic strategy)', () => {
+    expect(getAdvice({ total: 10, soft: false, pair: false, dealer: 'a', trueCount: 3 }).label)
+      .toBe('HIT');
+  });
+
+  // #12 Hard 9 vs 7
+  test('#12 hard 9 vs 7, TC +3 → DOUBLE', () => {
+    expect(getAdvice({ total: 9, soft: false, pair: false, dealer: '7', trueCount: 3 }).label)
+      .toBe('DOUBLE');
+  });
+  test('#12 hard 9 vs 7, TC +2 → HIT (basic strategy)', () => {
+    expect(getAdvice({ total: 9, soft: false, pair: false, dealer: '7', trueCount: 2 }).label)
+      .toBe('HIT');
+  });
+
+  // #13 Hard 16 vs 9
+  test('#13 hard 16 vs 9, TC +5 → STAND', () => {
+    expect(getAdvice({ total: 16, soft: false, pair: false, dealer: '9', trueCount: 5 }).label)
+      .toBe('STAND');
+  });
+  test('#13 hard 16 vs 9, TC +4 → HIT (basic strategy)', () => {
+    expect(getAdvice({ total: 16, soft: false, pair: false, dealer: '9', trueCount: 4 }).label)
+      .toBe('HIT');
+  });
+
+  // #14 Hard 13 vs 2
+  test('#14 hard 13 vs 2, TC -1 → HIT', () => {
+    expect(getAdvice({ total: 13, soft: false, pair: false, dealer: '2', trueCount: -1 }).label)
+      .toBe('HIT');
+  });
+  test('#14 hard 13 vs 2, TC 0 → STAND (basic strategy)', () => {
+    expect(getAdvice({ total: 13, soft: false, pair: false, dealer: '2', trueCount: 0 }).label)
+      .toBe('STAND');
+  });
+
+  // #15 Hard 12 vs 4
+  test('#15 hard 12 vs 4, TC -1 → HIT', () => {
+    expect(getAdvice({ total: 12, soft: false, pair: false, dealer: '4', trueCount: -1 }).label)
+      .toBe('HIT');
+  });
+  test('#15 hard 12 vs 4, TC 0 → STAND (basic strategy)', () => {
+    expect(getAdvice({ total: 12, soft: false, pair: false, dealer: '4', trueCount: 0 }).label)
+      .toBe('STAND');
+  });
+
+  // #16 Hard 13 vs 3
+  test('#16 hard 13 vs 3, TC -2 → HIT', () => {
+    expect(getAdvice({ total: 13, soft: false, pair: false, dealer: '3', trueCount: -2 }).label)
+      .toBe('HIT');
+  });
+  test('#16 hard 13 vs 3, TC -1 → STAND (basic strategy)', () => {
+    expect(getAdvice({ total: 13, soft: false, pair: false, dealer: '3', trueCount: -1 }).label)
+      .toBe('STAND');
+  });
+
+  // #17 Soft 19 (A+8) vs 6
+  test('#17 soft 19 vs 6, TC +1 → DOUBLE', () => {
+    expect(getAdvice({ total: 19, soft: true, pair: false, dealer: '6', trueCount: 1 }).label)
+      .toBe('DOUBLE');
+  });
+  test('#17 soft 19 vs 6, TC 0 → STAND (basic strategy)', () => {
+    expect(getAdvice({ total: 19, soft: true, pair: false, dealer: '6', trueCount: 0 }).label)
+      .toBe('STAND');
+  });
+});
