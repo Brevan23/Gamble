@@ -189,6 +189,13 @@ describe('Counter — hand state', () => {
     c.logCard('a', 'dealer');
     expect(c.dealerCard).toBe('a');
   });
+
+  test('logCard with target "dealer" still updates runningCount', () => {
+    const c = new Counter();
+    c.logCard('6', 'dealer'); // low card
+    expect(c.runningCount).toBe(1);
+    expect(c.cardsSeen).toBe(1);
+  });
 });
 
 describe('Counter — newHand', () => {
@@ -200,7 +207,7 @@ describe('Counter — newHand', () => {
     c.newHand();
     expect(c.playerCards).toEqual([]);
     expect(c.dealerCard).toBeNull();
-    expect(c.runningCount).toBe(1); // the 2 was still counted
+    expect(c.runningCount).toBe(2); // '2' (+1) and '6' (+1) both counted
     expect(c.cardsSeen).toBe(3);
   });
 });

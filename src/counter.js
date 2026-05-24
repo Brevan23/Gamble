@@ -22,11 +22,9 @@ class Counter {
   logCard(key, target) {
     const k = key.toLowerCase();
 
-    // Only count cards that are not dealer cards
-    if (target !== 'dealer') {
-      if (LOW.has(k))       this.runningCount += 1;
-      else if (HIGH.has(k)) this.runningCount -= 1;
-    }
+    // Count ALL cards regardless of target
+    if (LOW.has(k))       this.runningCount += 1;
+    else if (HIGH.has(k)) this.runningCount -= 1;
     this.cardsSeen += 1;
 
     if (target === 'player') {
