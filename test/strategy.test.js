@@ -160,6 +160,10 @@ describe('getAdvice — Illustrious 18 index plays (Hi-Lo 6-deck S17)', () => {
     expect(getAdvice({ total: 16, soft: false, pair: false, dealer: 't', trueCount: null }).label)
       .toBe('SURRENDER');
   });
+  test('trueCount NaN → hard 16 vs T still SURRENDER (NaN comparisons all false)', () => {
+    expect(getAdvice({ total: 16, soft: false, pair: false, dealer: 't', trueCount: NaN }).label)
+      .toBe('SURRENDER');
+  });
 
   // #1 Insurance
   test('#1 dealer A, TC +3 → TAKE INSURANCE', () => {
@@ -264,11 +268,12 @@ describe('getAdvice — Illustrious 18 index plays (Hi-Lo 6-deck S17)', () => {
   });
 
   // #11 Hard 10 vs A
-  test('#11 hard 10 vs A, TC +4 → TAKE INSURANCE (universal play)', () => {
+  // Note: insurance (#1) fires for any hand vs dealer A at TC ≥ +3, masking #11 at TC ≥ 4
+  test('#11 hard 10 vs A, TC +4 → TAKE INSURANCE (insurance takes priority)', () => {
     expect(getAdvice({ total: 10, soft: false, pair: false, dealer: 'a', trueCount: 4 }).label)
       .toBe('TAKE INSURANCE');
   });
-  test('#11 hard 10 vs A, TC +3 → TAKE INSURANCE (universal play)', () => {
+  test('#11 hard 10 vs A, TC +3 → TAKE INSURANCE (insurance takes priority)', () => {
     expect(getAdvice({ total: 10, soft: false, pair: false, dealer: 'a', trueCount: 3 }).label)
       .toBe('TAKE INSURANCE');
   });
